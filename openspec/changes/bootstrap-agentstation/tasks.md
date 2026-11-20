@@ -9,9 +9,9 @@
 
 ## 2. Dados, autenticação e auditoria
 
-- [ ] 2.1 Criar modelos e migrações (`tasks`, `task_events`, `approvals`, `effects`, `tickets`, `procedures`, `users`); verificar com `alembic upgrade head` em SQLite e um teste de criação
-- [ ] 2.2 Implementar JWT demo com papéis e escopo por tenant; verificar com testes de 401, 403 e 404 cross-tenant
-- [ ] 2.3 Criar o seed sintético (2 tenants, ≥30 tickets, ≥15 procedimentos incluindo um contraditório e um ticket malicioso); verificar que o comando de seed é idempotente
+- [x] 2.1 Criar modelos e migrações (`tasks`, `task_events`, `approvals`, `effects`, `tickets`, `procedures`, `users`); verificar com `alembic upgrade head` em SQLite e um teste de criação
+- [x] 2.2 Implementar JWT demo com papéis e escopo por tenant; verificar com testes de 401, 403 e 404 cross-tenant
+- [x] 2.3 Criar o seed sintético (2 tenants, ≥30 tickets, ≥15 procedimentos incluindo um contraditório e um ticket malicioso); verificar que o comando de seed é idempotente
 
 ## 3. Ferramentas
 
