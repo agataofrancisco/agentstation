@@ -2,10 +2,10 @@
 
 ## 1. Fundações
 
-- [ ] 1.1 Criar a estrutura `backend/app/{api,graph,agents,tools,memory,auth,store,workers}`, `frontend/`, `migrations/`, `eval/`, `data/demo/` e `docs/learn/`; verificar com `git status`
-- [ ] 1.2 Confirmar na documentação oficial e fixar versões (FastAPI, Pydantic v2, LangGraph + checkpointer Postgres, SQLAlchemy, Alembic, Celery, redis, chromadb, httpx, pytest, Ruff); verificar a instalação num venv limpo
-- [ ] 1.3 Implementar `Settings`, `.env.example`, `/health` mínimo, Ruff e pytest; verificar que `ruff check` e `pytest` passam
-- [ ] 1.4 Escrever `docs/learn/00-visao-geral.md` com o diagrama Mermaid do grafo e dos processos (API, worker, DB, fila); verificar que corresponde à estrutura criada
+- [x] 1.1 Criar a estrutura `backend/app/{api,graph,agents,tools,memory,auth,store,workers}`, `frontend/`, `migrations/`, `eval/`, `data/demo/` e `docs/learn/`; verificar com `git status`
+- [x] 1.2 Confirmar na documentação oficial e fixar versões (FastAPI, Pydantic v2, LangGraph + checkpointer Postgres, SQLAlchemy, Alembic, Celery, redis, chromadb, httpx, pytest, Ruff); verificar a instalação num venv limpo
+- [x] 1.3 Implementar `Settings`, `.env.example`, `/health` mínimo, Ruff e pytest; verificar que `ruff check` e `pytest` passam
+- [x] 1.4 Escrever `docs/learn/00-visao-geral.md` com o diagrama Mermaid do grafo e dos processos (API, worker, DB, fila); verificar que corresponde à estrutura criada
 
 ## 2. Dados, autenticação e auditoria
 

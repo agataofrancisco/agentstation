@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentstation"
+version = "0.1.0"
+description = "Orquestracao multi-agente com estado duravel e aprovacao humana (helpdesk Nimbo)"
+requires-python = ">=3.12"
+# Versoes fixadas (verificadas com pip index / pip freeze em 2026-11-20).
+dependencies = [
+  "fastapi==0.165.0",
+  "pydantic==2.14.4",
+  "pydantic-settings==2.16.3",
+  "langgraph==1.2.24",
+  "langgraph-checkpoint-postgres==3.2.1",
+  "langgraph-checkpoint-sqlite==3.1.3",
+  "sqlalchemy==2.1.9",
+  "alembic==1.20.1",
+  "psycopg[binary]==3.3.9",
+  "celery==5.7.0",
+  "redis==8.1.0",
+  "chromadb==1.5.9",
+  "httpx==0.28.1",
+  "pyjwt==2.15.1",
+  "sse-starlette==3.7.0",
+  "uvicorn==0.54.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest==9.2.0",
+  "ruff==0.17.6",
+  "fakeredis==2.40.0",
+  "pgserver==0.1.4",
+]
+
+[tool.setuptools.packages.find]
+include = ["backend*", "eval*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra --strict-markers"
+markers = [
+  "postgres: testes que usam PostgreSQL real (pgserver local, sem Docker)",
+  "redis: testes que precisam de Redis real (saltados se inacessivel)",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
