@@ -109,7 +109,7 @@ def test_account_action_on_other_tenant_user_is_not_found(session):
     assert outcome.error == "not_found"
 
 
-def test_effect_is_applied_once_for_same_key(session):
+def test_effect_is_applied_once_for_same_key(app, session):
     kwargs = dict(
         tenant_id="nimbo",
         task_id="task-e",
@@ -117,9 +117,9 @@ def test_effect_is_applied_once_for_same_key(session):
         action="reset_mfa",
         params={"user_id": "joao@nimbo"},
     )
-    result1, created1 = apply_effect(session, **kwargs)
-    result2, created2 = apply_effect(session, **kwargs)
-    assert created1 is True and created2 is False
+    result1, state1 = apply_effect(app.state.session_factory, **kwargs)
+    result2, state2 = apply_effect(app.state.session_factory, **kwargs)
+    assert state1 == "executed" and state2 == "duplicate"
     assert result1 == result2 == {"user_id": "joao@nimbo", "mfa_reset_count": 1}
     assert session.query(Effect).count() == 1
     assert session.get(User, "joao@nimbo").mfa_reset_count == 1
@@ -132,17 +132,18 @@ def test_effect_key_depends_on_approval_and_params():
     assert base != idempotency_key("t", "a1", "reset_mfa", {"user_id": "y@nimbo"})
 
 
-def test_effect_on_other_tenant_fails_without_side_effect(session):
+def test_effect_on_other_tenant_fails_without_side_effect(app, session):
     with pytest.raises(ToolError):
         apply_effect(
-            session,
+            app.state.session_factory,
             tenant_id="nimbo",
             task_id="t",
             approval_id="a",
             action="reset_mfa",
             params={"user_id": "marta@atlas"},
         )
-    assert session.query(Effect).count() == 0
+    # Sem efeito aplicado; fica apenas o registo `failed` para auditoria.
+    assert session.query(Effect).filter_by(status="done").count() == 0
     assert session.get(User, "marta@atlas").mfa_reset_count == 0
 
 

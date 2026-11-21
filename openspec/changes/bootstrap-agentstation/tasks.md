@@ -29,11 +29,11 @@
 
 ## 5. Durabilidade, aprovação e idempotência
 
-- [ ] 5.1 Ligar o checkpointer (memória/SQLite nos testes, Postgres configurável) com `thread_id = task_id`; verificar com teste de inspecção do checkpoint a meio
-- [ ] 5.2 Implementar `approval_gate` com `interrupt`, a persistência da aprovação e a retoma com `Command(resume=...)` (aprovar, rejeitar, editar); verificar com testes dos três caminhos e 403 para requester
-- [ ] 5.3 Implementar `execute_action` com a tabela `effects` e a reconciliação `effect_pending`; verificar com testes de resolução duplicada e reexecução do nó → `duplicate_effect_prevented`
+- [x] 5.1 Ligar o checkpointer (memória/SQLite nos testes, Postgres configurável) com `thread_id = task_id`; verificar com teste de inspecção do checkpoint a meio
+- [x] 5.2 Implementar `approval_gate` com `interrupt`, a persistência da aprovação e a retoma com `Command(resume=...)` (aprovar, rejeitar, editar); verificar com testes dos três caminhos e 403 para requester
+- [x] 5.3 Implementar `execute_action` com a tabela `effects` e a reconciliação `effect_pending`; verificar com testes de resolução duplicada e reexecução do nó → `duplicate_effect_prevented`
 - [ ] 5.4 Implementar os workers Celery (`run_task`, `resume_task`, `acks_late`) e o teste de crash (terminar o processo a meio e retomar); verificar com `pytest -m postgres` quando houver Postgres, ou registar a pendência
-- [ ] 5.5 Escrever `docs/learn/03-checkpoints-e-durabilidade.md`, `04-interrupt-e-aprovacao.md` e `05-idempotencia-exactly-once.md`; verificar que a explicação da reexecução do nó tem um teste que a demonstra
+- [x] 5.5 Escrever `docs/learn/03-checkpoints-e-durabilidade.md`, `04-interrupt-e-aprovacao.md` e `05-idempotencia-exactly-once.md`; verificar que a explicação da reexecução do nó tem um teste que a demonstra
 
 ## 6. Memória
 

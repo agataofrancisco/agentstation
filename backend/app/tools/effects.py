@@ -1,7 +1,9 @@
 """Sistema simulado com registo de efeitos. Nenhum sistema externo e contactado.
 
-A chave de idempotencia e derivada de (task_id, approval_id, action, params normalizados),
-por isso a mesma aprovacao nunca produz dois efeitos.
+Duas fases (ver docs/learn/05):
+  1. INSERT do registo `effect_pending` (com chave UNIQUE) e commit: marca a intencao.
+  2. Uma transaccao: aplicar a alteracao + marcar `done` com o resultado. Ou ambas ou nenhuma.
+Se o processo morrer entre as fases, a linha `effect_pending` e reconciliada na retoma.
 """
 
 from __future__ import annotations
@@ -11,9 +13,10 @@ import json
 import time
 from typing import Any
 
-from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session, sessionmaker
 
-from backend.app.store.models import Effect, Ticket, User
+from backend.app.store.models import Effect, Task, Ticket, User
 from backend.app.tools.errors import ToolError
 
 
@@ -58,33 +61,94 @@ def _perform(session: Session, tenant_id: str, action: str, params: dict[str, An
 
 
 def apply_effect(
-    session: Session,
+    session_factory: sessionmaker,
     *,
     tenant_id: str,
     task_id: str,
     approval_id: str,
     action: str,
     params: dict[str, Any],
-) -> tuple[dict, bool]:
-    """Aplica o efeito no maximo uma vez. Devolve (resultado, criado_agora)."""
+) -> tuple[dict, str]:
+    """Aplica o efeito no maximo uma vez.
+
+    Devolve (resultado, estado) com estado em {"executed", "duplicate", "reconciled"}.
+    """
+    params = normalize_params(params)
     key = idempotency_key(task_id, approval_id, action, params)
-    existing = session.query(Effect).filter(Effect.idempotency_key == key).one_or_none()
-    if existing is not None:
-        return dict(existing.result or {}), False
-    result = _perform(session, tenant_id, action, normalize_params(params))
-    now = time.time()
-    session.add(
-        Effect(
-            idempotency_key=key,
-            task_id=task_id,
-            approval_id=approval_id,
-            action=action,
-            params=normalize_params(params),
-            status="done",
-            result=result,
-            created_at=now,
-            completed_at=now,
-        )
-    )
-    session.commit()
-    return result, True
+
+    with session_factory() as s:
+        existing = s.query(Effect).filter(Effect.idempotency_key == key).one_or_none()
+        if existing is not None and existing.status == "done":
+            return dict(existing.result or {}), "duplicate"
+        pending_before = existing is not None
+        if existing is None:
+            s.add(
+                Effect(
+                    idempotency_key=key,
+                    task_id=task_id,
+                    approval_id=approval_id,
+                    action=action,
+                    params=params,
+                    status="effect_pending",
+                    created_at=time.time(),
+                )
+            )
+            try:
+                s.commit()  # fase 1: intencao durável
+            except IntegrityError:
+                s.rollback()
+                return apply_effect(
+                    session_factory,
+                    tenant_id=tenant_id,
+                    task_id=task_id,
+                    approval_id=approval_id,
+                    action=action,
+                    params=params,
+                )
+
+        try:
+            result = _perform(
+                s, tenant_id, action, params
+            )  # fase 2: efeito + done na mesma transaccao
+        except ToolError:
+            s.rollback()
+            row = s.query(Effect).filter(Effect.idempotency_key == key).one()
+            row.status = "failed"
+            row.completed_at = time.time()
+            s.commit()
+            raise
+        row = s.query(Effect).filter(Effect.idempotency_key == key).one()
+        row.status = "done"
+        row.result = result
+        row.completed_at = time.time()
+        s.commit()
+    return result, "reconciled" if pending_before else "executed"
+
+
+def reconcile_pending(session_factory: sessionmaker) -> list[str]:
+    """Na arranque: refaz os efeitos `effect_pending` (o simulado e atomico)."""
+    done: list[str] = []
+    with session_factory() as s:
+        pending = s.query(Effect).filter(Effect.status == "effect_pending").all()
+        items = [
+            (e.idempotency_key, e.task_id, e.approval_id, e.action, dict(e.params)) for e in pending
+        ]
+    for key, task_id, approval_id, action, params in items:
+        with session_factory() as s:
+            task = s.get(Task, task_id)
+            tenant = task.tenant_id if task is not None else None
+        if tenant is None:
+            continue
+        try:
+            apply_effect(
+                session_factory,
+                tenant_id=tenant,
+                task_id=task_id,
+                approval_id=approval_id,
+                action=action,
+                params=params,
+            )
+            done.append(key)
+        except ToolError:
+            continue
+    return done

@@ -17,7 +17,7 @@ from backend.app.graph.build import recursion_limit_for
 from backend.app.graph.runtime import GraphDeps
 from backend.app.graph.state import TaskState
 from backend.app.store.events import add_event
-from backend.app.store.models import Task
+from backend.app.store.models import Approval, Task
 
 TERMINAL = {"completed", "rejected", "failed", "limit_exceeded", "needs_review"}
 
@@ -84,7 +84,8 @@ def graph_config(task_id: str, deps: GraphDeps) -> dict[str, Any]:
 def run_graph(graph, deps: GraphDeps, task_id: str, payload: Any) -> dict[str, Any]:
     """payload: TaskState inicial, None (continuar checkpoint) ou Command(resume=...)."""
     config = graph_config(task_id, deps)
-    result = graph.invoke(payload, config=config)
+    # durability="sync": o checkpoint fica escrito antes do no seguinte (necessario para crash).
+    result = graph.invoke(payload, config=config, durability="sync")
     persist_outcome(deps, task_id, result)
     return result
 
@@ -125,3 +126,92 @@ def interrupt_payload(result: dict[str, Any]) -> dict[str, Any] | None:
 
 def resume_command(decision: dict[str, Any]) -> Command:
     return Command(resume=decision)
+
+
+class ApprovalNotFound(Exception):
+    pass
+
+
+class ApprovalForbidden(Exception):
+    pass
+
+
+class InvalidDecision(Exception):
+    pass
+
+
+DECISIONS = ("approve", "reject", "edit")
+
+
+def validate_edit(action: str, params: Any) -> dict[str, Any]:
+    """Edicao de parametros antes de aprovar: so campos que o sistema aceita para aquela acao."""
+    if not isinstance(params, dict):
+        raise InvalidDecision("params tem de ser um objecto")
+    if action == "suspend_account":
+        days = params.get("days")
+        if not isinstance(days, int) or isinstance(days, bool) or not 1 <= days <= 365:
+            raise InvalidDecision("days tem de ser inteiro entre 1 e 365")
+        return {"user_id": str(params.get("user_id", "")), "days": days}
+    if action in ("reset_mfa", "unsuspend_account"):
+        return {"user_id": str(params.get("user_id", ""))}
+    if action == "set_ticket_status":
+        return {
+            "ticket_id": str(params.get("ticket_id", "")),
+            "status": str(params.get("status", "")),
+        }
+    if action == "review_conflict":
+        return dict(params)
+    raise InvalidDecision("acao desconhecida")
+
+
+def resolve_approval(
+    session: Session,
+    principal: Principal,
+    approval_id: str,
+    *,
+    decision: str,
+    params: dict[str, Any] | None = None,
+    comment: str | None = None,
+    clock=time.time,
+) -> tuple[Approval, bool]:
+    """Devolve (aprovacao, mudou). Segunda resolucao nao altera nada (idempotente)."""
+    from backend.app.store.approvals import audit
+
+    approval = session.get(Approval, approval_id)
+    if approval is None or approval.tenant_id != principal.tenant_id:
+        raise ApprovalNotFound()
+    if not principal.is_reviewer:
+        raise ApprovalForbidden()
+    if decision not in DECISIONS:
+        raise InvalidDecision("decisao invalida")
+    if approval.status != "pending":
+        return approval, False
+
+    if decision == "edit":
+        edited = validate_edit(approval.action, params)
+        audit(
+            session,
+            approval,
+            principal.user_id,
+            "edited",
+            {"original": dict(approval.original_params), "edited": edited},
+        )
+        approval.params = edited
+        approval.status = "approved"
+    elif decision == "approve":
+        approval.status = "approved"
+    else:
+        approval.status = "rejected"
+    approval.decision = decision
+    approval.decided_by = principal.user_id
+    approval.decided_at = clock()
+    approval.decision_comment = (comment or "")[:1000]
+    audit(
+        session,
+        approval,
+        principal.user_id,
+        "decided",
+        {"decision": decision, "comment": approval.decision_comment},
+    )
+    session.commit()
+    return approval, True

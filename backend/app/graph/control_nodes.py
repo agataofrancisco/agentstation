@@ -179,18 +179,25 @@ def make_execute_action(deps: GraphDeps):
         params = decision.get("params") or pending["params"]
         with deps.session_factory() as session:
             emit = emit_for(session, state, node="execute_action", agent="execute_action")
-            result, created = apply_effect(
-                session,
+            if decision.get("params") and decision["params"] != pending["params"]:
+                emit("approval_edited", {"original": pending["params"], "edited": params})
+            result, outcome = apply_effect(
+                deps.session_factory,
                 tenant_id=state["tenant_id"],
                 task_id=state["task_id"],
                 approval_id=pending["approval_id"],
                 action=pending["action"],
                 params=params,
             )
-            emit(
-                "effect_executed" if created else "duplicate_effect_prevented",
-                {"action": pending["action"], "result": result},
-            )
+            event = {
+                "executed": "effect_executed",
+                "duplicate": "duplicate_effect_prevented",
+                "reconciled": "effect_reconciled",
+            }[outcome]
+            emit(event, {"action": pending["action"], "result": result})
+            approval = session.get(Approval, pending["approval_id"])
+            approval.execution_result = result
+            session.commit()
         return {"effect_result": result}
 
     return execute_action
