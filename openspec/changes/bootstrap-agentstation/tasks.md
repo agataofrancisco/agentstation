@@ -15,9 +15,9 @@
 
 ## 3. Ferramentas
 
-- [ ] 3.1 Implementar o registo de ferramentas, os schemas e o executor (validação → autorização → execução → evento); verificar com testes de `unknown_tool`, argumentos inválidos e `tool_not_allowed`
-- [ ] 3.2 Implementar as 6 ferramentas sobre os dados demo e o sistema de efeitos simulado; verificar com testes de not_found cross-tenant e registo de efeito
-- [ ] 3.3 Escrever `docs/learn/06-ferramentas-e-autorizacao.md`; verificar que cada regra citada tem um teste
+- [x] 3.1 Implementar o registo de ferramentas, os schemas e o executor (validação → autorização → execução → evento); verificar com testes de `unknown_tool`, argumentos inválidos e `tool_not_allowed`
+- [x] 3.2 Implementar as 6 ferramentas sobre os dados demo e o sistema de efeitos simulado; verificar com testes de not_found cross-tenant e registo de efeito
+- [x] 3.3 Escrever `docs/learn/06-ferramentas-e-autorizacao.md`; verificar que cada regra citada tem um teste
 
 ## 4. Grafo e orquestração
 
