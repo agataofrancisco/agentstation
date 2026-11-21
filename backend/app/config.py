@@ -42,6 +42,9 @@ class Settings(BaseSettings):
     chroma_path: str = "data/runtime/chroma"
     worker_heartbeat_ttl_s: float = Field(default=30.0, gt=0)
 
+    # So para testes de recuperacao: termina o processo ao entrar neste no.
+    crash_at_node: str | None = None
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

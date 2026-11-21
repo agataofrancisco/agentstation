@@ -21,11 +21,11 @@
 
 ## 4. Grafo e orquestração
 
-- [ ] 4.1 Implementar o provider LLM (compatível com OpenAI, timeout/retries) e o provider falso determinístico com respostas por cenário; verificar com testes com servidor HTTP falso
-- [ ] 4.2 Implementar o estado do grafo, os nós `supervisor`, `triage`, `knowledge_retrieval` e `reporting` e o encaminhamento estruturado; verificar com teste do pedido de 3 subtarefas em modo fake
-- [ ] 4.3 Implementar o nó `verifier` e as guardas de limites (iterações, ferramentas, tempo, tokens, custo); verificar com testes de resposta sem evidência e de ciclo infinito → `limit_exceeded`
-- [ ] 4.4 Implementar a detecção `suspected_injection` e a garantia de que não salta aprovação; verificar com o cenário do ticket malicioso
-- [ ] 4.5 Escrever `docs/learn/01-langgraph-stategraph.md`, `02-supervisor-e-agentes.md` e `08-limites-e-custos.md`; verificar que os exemplos de estado vêm de uma execução real
+- [x] 4.1 Implementar o provider LLM (compatível com OpenAI, timeout/retries) e o provider falso determinístico com respostas por cenário; verificar com testes com servidor HTTP falso
+- [x] 4.2 Implementar o estado do grafo, os nós `supervisor`, `triage`, `knowledge_retrieval` e `reporting` e o encaminhamento estruturado; verificar com teste do pedido de 3 subtarefas em modo fake
+- [x] 4.3 Implementar o nó `verifier` e as guardas de limites (iterações, ferramentas, tempo, tokens, custo); verificar com testes de resposta sem evidência e de ciclo infinito → `limit_exceeded`
+- [x] 4.4 Implementar a detecção `suspected_injection` e a garantia de que não salta aprovação; verificar com o cenário do ticket malicioso
+- [x] 4.5 Escrever `docs/learn/01-langgraph-stategraph.md`, `02-supervisor-e-agentes.md` e `08-limites-e-custos.md`; verificar que os exemplos de estado vêm de uma execução real
 
 ## 5. Durabilidade, aprovação e idempotência
 
