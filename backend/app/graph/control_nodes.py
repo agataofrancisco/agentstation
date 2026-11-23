@@ -33,6 +33,8 @@ def make_supervisor(deps: GraphDeps):
             }
         with deps.session_factory() as session:
             emit = emit_for(session, state, node="supervisor", agent="supervisor")
+            if counters.get("iterations") == 1:
+                _recall(deps, session, state, emit)
             try:
                 resp = deps.llm.generate(
                     "supervisor",
@@ -211,7 +213,60 @@ def make_finalize(deps: GraphDeps):
             status = "rejected" if decision == "reject" else "completed"
         with deps.session_factory() as session:
             emit = emit_for(session, state, node="finalize", agent="finalize")
+            if status == "completed":
+                _remember(deps, session, state, emit)
             emit("task_finished", {"status": status, "limit_reason": state.get("limit_reason")})
         return {"status": status}
 
     return finalize
+
+
+def _memory_enabled(session, user_id: str) -> bool:
+    from backend.app.store.models import User
+
+    user = session.get(User, user_id)
+    return bool(user and user.memory_enabled)
+
+
+def _recall(deps: GraphDeps, session, state: TaskState, emit) -> None:
+    if deps.memory is None or not _memory_enabled(session, state["user_id"]):
+        return
+    hits = deps.memory.search(
+        tenant_id=state["tenant_id"], user_id=state["user_id"], query=state.get("request", "")
+    )
+    emit(
+        "memory_recalled",
+        {
+            "memories": [{"id": m.id, "text": m.text, "source_task": m.source_task} for m in hits],
+            "reason": "similaridade semantica com o pedido, dentro da validade",
+        },
+    )
+
+
+def _remember(deps: GraphDeps, session, state: TaskState, emit) -> None:
+    from backend.app.memory.filter import write_decision
+
+    if deps.memory is None or not _memory_enabled(session, state["user_id"]):
+        return
+    results = state.get("results") or {}
+    triage = results.get("triage") or {}
+    knowledge = results.get("knowledge_retrieval") or {}
+    summary = (
+        f"Ticket {triage.get('ticket_id')}; "
+        f"procedimentos: {', '.join(knowledge.get('procedure_ids') or [])}"
+    )
+    candidate = f"{state.get('request', '')} | {summary}"
+    untrusted = "suspected_injection" in (state.get("flags") or [])
+    allowed, reason = write_decision(candidate, untrusted_origin=untrusted)
+    if not allowed:
+        emit("memory_write_blocked", {"reason": reason})
+        return
+    mem_id = deps.memory.add(
+        tenant_id=state["tenant_id"],
+        user_id=state["user_id"],
+        text=candidate,
+        source_task=state["task_id"],
+        ttl_days=deps.settings.memory_ttl_days,
+        memory_id=f"mem-{state['task_id']}",  # idempotente se o no for reexecutado
+    )
+    emit("memory_written", {"memory_id": mem_id})

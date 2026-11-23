@@ -10,6 +10,7 @@ from backend.app.config import Settings, get_settings
 from backend.app.graph.build import build_graph
 from backend.app.graph.checkpointer import open_checkpointer
 from backend.app.graph.runtime import GraphDeps
+from backend.app.memory.store import MemoryStore
 from backend.app.store.db import make_engine, make_session_factory
 
 
@@ -31,13 +32,15 @@ def configure(settings: Settings, *, checkpointer: Any | None = None) -> Runtime
         settings=settings,
         session_factory=session_factory,
         llm=make_provider(settings),
+        memory=MemoryStore(settings.chroma_path),
     )
     saver = checkpointer if checkpointer is not None else open_checkpointer(settings.checkpoint_url)
     _RUNTIME = Runtime(settings=settings, deps=deps, graph=build_graph(deps, saver))
     return _RUNTIME
 
 
-def current() -> Runtime:
+def current(settings: Settings | None = None) -> Runtime:
+    """Runtime do processo; configura na primeira utilizacao (definicoes dadas ou do ambiente)."""
     if _RUNTIME is None:
-        return configure(get_settings())
+        return configure(settings or get_settings())
     return _RUNTIME

@@ -27,9 +27,14 @@ def settings(tmp_path) -> Settings:
 
 
 @pytest.fixture
-def app(settings):
+def app(settings, tmp_path):
+    from backend.app.graph.checkpointer import open_checkpointer
+    from backend.app.workers.runtime import configure
+
     application = create_app(settings, create_tables=True)
     load_seed(application.state.session_factory, SEED_PATH)
+    # Execucao eager (sem worker): o runtime do processo usa checkpointer SQLite de teste.
+    configure(settings, checkpointer=open_checkpointer(sqlite_url(tmp_path / "cp.db")))
     return application
 
 

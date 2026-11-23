@@ -25,6 +25,7 @@ class GraphDeps:
     session_factory: sessionmaker
     llm: LLMProvider
     clock: Callable[[], float] = field(default=time.time)
+    memory: Any = None  # MemoryStore | None (opt-in por utilizador)
 
 
 def emit_for(

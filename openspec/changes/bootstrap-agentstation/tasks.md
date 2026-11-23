@@ -37,15 +37,15 @@
 
 ## 6. Memória
 
-- [ ] 6.1 Implementar a memória Chroma por tenant/utilizador com opt-in, TTL e o filtro de escrita (segredos/PII); verificar com testes de memória desligada, isolamento, password bloqueada e expiração
-- [ ] 6.2 Expor `GET /memory` e `DELETE /memory/{id}` e mostrar as memórias recordadas por tarefa; verificar com teste de eliminação
-- [ ] 6.3 Escrever `docs/learn/07-memoria.md`; verificar que os riscos descritos têm testes
+- [x] 6.1 Implementar a memória Chroma por tenant/utilizador com opt-in, TTL e o filtro de escrita (segredos/PII); verificar com testes de memória desligada, isolamento, password bloqueada e expiração
+- [x] 6.2 Expor `GET /memory` e `DELETE /memory/{id}` e mostrar as memórias recordadas por tarefa; verificar com teste de eliminação
+- [x] 6.3 Escrever `docs/learn/07-memoria.md`; verificar que os riscos descritos têm testes
 
 ## 7. API e eventos
 
-- [ ] 7.1 Implementar `POST /tasks`, `GET /tasks/{id}`, `GET /approvals` e `POST /approvals/{id}/resolve` com escopo por papel; verificar com testes de API
-- [ ] 7.2 Implementar o SSE `GET /tasks/{id}/events` com `Last-Event-ID`; verificar com teste de reconexão sem duplicados
-- [ ] 7.3 Implementar `/metrics` (admin) e o `/health` completo (DB, fila, worker); verificar com teste de worker em baixo → `degraded`
+- [x] 7.1 Implementar `POST /tasks`, `GET /tasks/{id}`, `GET /approvals` e `POST /approvals/{id}/resolve` com escopo por papel; verificar com testes de API
+- [x] 7.2 Implementar o SSE `GET /tasks/{id}/events` com `Last-Event-ID`; verificar com teste de reconexão sem duplicados
+- [x] 7.3 Implementar `/metrics` (admin) e o `/health` completo (DB, fila, worker); verificar com teste de worker em baixo → `degraded`
 
 ## 8. Frontend
 
