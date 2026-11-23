@@ -49,9 +49,9 @@
 
 ## 8. Frontend
 
-- [ ] 8.1 Criar a app React com login por persona, lista de tarefas e criação de pedido; verificar com `npm run build`
+- [x] 8.1 Criar a app React com login por persona, lista de tarefas e criação de pedido; verificar com `npm run build`
 - [ ] 8.2 Implementar o diagrama do grafo com nó actual e a linha temporal por SSE; verificar no browser com uma tarefa de 3 subtarefas
-- [ ] 8.3 Implementar a fila de aprovações (aceitar, rejeitar, editar), o painel de memória e a exportação; verificar no browser os fluxos de aprovação e de rejeição
+- [x] 8.3 Implementar a fila de aprovações (aceitar, rejeitar, editar), o painel de memória e a exportação; verificar no browser os fluxos de aprovação e de rejeição
 
 ## 9. Avaliação
 

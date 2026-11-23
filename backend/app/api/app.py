@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.api.routes_approvals import router as approvals_router
 from backend.app.api.routes_auth import router as auth_router
@@ -24,6 +25,13 @@ def create_app(settings: Settings | None = None, *, create_tables: bool = False)
     app.state.engine = engine
     app.state.session_factory = make_session_factory(engine)
 
+    origins = [o.strip() for o in cfg.cors_origins.split(",") if o.strip()]
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_methods=["GET", "POST", "DELETE"],
+        allow_headers=["Authorization", "Content-Type", "Last-Event-ID"],
+    )
     app.include_router(auth_router)
     app.include_router(tasks_router)
     app.include_router(approvals_router)
