@@ -8,12 +8,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 from typing import Any
 
 from sqlalchemy.orm import sessionmaker
 
-from backend.app.config import get_settings
 from backend.app.store.db import make_engine, make_session_factory
 from backend.app.store.models import Procedure, Tenant, Ticket, User
 
@@ -47,8 +47,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Carrega o seed demo (idempotente).")
     parser.add_argument("--path", default=str(DEFAULT_PATH))
     args = parser.parse_args()
-    settings = get_settings()
-    engine = make_engine(settings.database_url)
+    # So a URL da base de dados: o seed nao precisa de JWT nem de definicoes completas.
+    engine = make_engine(os.environ.get("DATABASE_URL", "sqlite:///data/runtime/agentstation.db"))
     counts = load_seed(make_session_factory(engine), Path(args.path))
     print(json.dumps({"seeded": counts}, ensure_ascii=False))
 

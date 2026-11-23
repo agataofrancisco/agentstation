@@ -5,7 +5,6 @@ from logging.config import fileConfig
 
 from alembic import context
 
-from backend.app.config import get_settings
 from backend.app.store import models  # noqa: F401  (regista os modelos no metadata)
 from backend.app.store.db import Base, make_engine
 
@@ -13,8 +12,9 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
+# So precisa da URL da base de dados (nao das definicoes completas, que exigem JWT fora de demo).
 url = context.get_x_argument(as_dictionary=True).get("url") or os.environ.get(
-    "DATABASE_URL", get_settings().database_url
+    "DATABASE_URL", "sqlite:///data/runtime/agentstation.db"
 )
 target_metadata = Base.metadata
 

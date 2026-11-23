@@ -58,7 +58,7 @@ def traced(
     """Regista node_started / node_finished. Nao capta excepcoes (GraphInterrupt tem de passar)."""
 
     def node(state: TaskState) -> dict:
-        if deps.settings.crash_at_node == name:
+        if deps.settings.crash_hook_enabled and deps.settings.crash_at_node == name:
             # Teste de recuperacao: sai do processo sem limpeza, como um crash real.
             os._exit(CRASH_EXIT_CODE)
         with deps.session_factory() as session:

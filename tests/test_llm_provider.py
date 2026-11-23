@@ -62,6 +62,7 @@ def provider_factory():
         server = make_server(script)
         servers.append(server)
         cfg = Settings(
+            demo_mode=True,
             llm_provider="openai",
             llm_api_key="chave-de-teste-nao-real",
             llm_base_url=f"http://127.0.0.1:{server.server_port}/v1",
@@ -135,13 +136,16 @@ def test_client_error_is_not_retried(provider_factory):
 
 def test_missing_api_key_refuses_to_start():
     with pytest.raises(LLMError):
-        OpenAICompatibleProvider(Settings(llm_provider="openai", llm_api_key=None))
+        OpenAICompatibleProvider(Settings(demo_mode=True, llm_provider="openai", llm_api_key=None))
 
 
 def test_auto_provider_uses_fake_without_key():
     from backend.app.agents.factory import make_provider
 
-    assert make_provider(Settings(llm_provider="auto", llm_api_key=None)).name == "fake"
+    assert (
+        make_provider(Settings(demo_mode=True, llm_provider="auto", llm_api_key=None)).name
+        == "fake"
+    )
 
 
 def test_observations_are_sent_as_delimited_untrusted_data(provider_factory):

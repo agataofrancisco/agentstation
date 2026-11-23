@@ -17,9 +17,9 @@
 
 ## Achados em aberto
 
-1. **`DEMO_MODE` tem omissão `true`** (`backend/app/config.py`). O login por persona sem palavra-passe fica activo por omissão. Risco alto se a API for exposta. Recomendação: omissão `false` e exigir activação explícita.
-2. **Segredo JWT predefinido.** `jwt_secret` tem um valor público no código. Qualquer instância que não o substitua aceita tokens forjados. Recomendação: recusar arranque com `demo_mode=false` e segredo predefinido. Não implementado.
-3. **Gancho de teste em código de produção.** `CRASH_AT_NODE` faz o processo terminar. Se definido por engano num worker, derruba execuções. Recomendação: só ativo com `APP_ENV=test`. Não implementado.
+1. **RESOLVIDO — `DEMO_MODE` por omissão `false`** (fail-closed) em `backend/app/config.py`. O login por persona só existe com `DEMO_MODE=true`. Testes: `tests/test_security_settings.py::test_demo_mode_is_off_by_default`, `tests/test_config.py::test_defaults_are_fail_closed`.
+2. **RESOLVIDO — segredo JWT.** O valor público foi removido do código. Fora de demo o arranque é recusado sem `JWT_SECRET` de pelo menos 32 caracteres; em demo gera-se um segredo efémero por processo. Testes: `test_outside_demo_missing_secret_refuses_to_start`, `test_outside_demo_short_secret_refuses_to_start`, `test_demo_generates_ephemeral_secret_per_process`, `test_public_default_secret_is_gone_from_code`.
+3. **RESOLVIDO — gancho de crash restrito.** `CRASH_AT_NODE` só tem efeito com `ALLOW_TEST_HOOKS=true` **e** `DEMO_MODE=true` (`Settings.crash_hook_enabled`, usado em `backend/app/graph/runtime.py`). Testes: matriz completa em `test_crash_hook_requires_demo_and_explicit_flag` e `test_traced_node_does_not_exit_when_hook_disabled`.
 4. **Injecção: defesa estrutural, não por padrões.** O varrimento de padrões (`backend/app/tools/injection.py`) é heurístico e fácil de contornar. A protecção real é a aprovação obrigatória para acções mutáveis e a autorização no backend. Um modelo que siga instruções pode propor acções erradas; o revisor é o controlo.
 5. **Validação de edição não verifica tenant no momento da edição.** `validate_edit` não confirma que o `user_id` pertence ao tenant. A execução (`_perform`) confirma e devolve `not_found`, por isso não há efeito cruzado, mas o revisor vê um pedido inválido só depois.
 6. **Imutabilidade da auditoria é aplicacional.** `approval_audit` não tem gatilhos na base de dados; um acesso directo à base de dados pode alterar linhas. Recomendação: permissões de base de dados (só `INSERT`) e encadeamento de hashes.

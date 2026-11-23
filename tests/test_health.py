@@ -6,6 +6,7 @@ from backend.app.config import Settings
 
 def test_health_reports_components(tmp_path):
     cfg = Settings(
+        demo_mode=True,
         celery_eager=True,
         database_url=f"sqlite:///{(tmp_path / 'h.db').as_posix()}",
     )

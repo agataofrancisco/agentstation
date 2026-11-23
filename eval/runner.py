@@ -138,6 +138,7 @@ def _run_recovery(tmp: Path) -> dict:
         "CELERY_EAGER": "true",
         "LLM_PROVIDER": "fake",
         "DEMO_MODE": "true",
+        "ALLOW_TEST_HOOKS": "true",
     }
     t0 = time.perf_counter()
     crashed = subprocess.run(

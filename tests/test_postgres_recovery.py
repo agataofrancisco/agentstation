@@ -50,6 +50,7 @@ def _env(pg, tmp_path, **extra):
         "CELERY_EAGER": "true",
         "CHROMA_PATH": str(tmp_path / "chroma"),
         "DEMO_MODE": "true",
+        "ALLOW_TEST_HOOKS": "true",
         "LLM_PROVIDER": "fake",
     }
     env.update(extra)
