@@ -1,0 +1,249 @@
+{
+  "metadata": {
+    "generated_at": "2026-11-23T09:18:15+00:00",
+    "commit": "fc48b12c358c1d85f94f373ec1e7f339b84ca180",
+    "provider": "fake",
+    "reps_per_scenario": 3,
+    "python": "3.12.10",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "llm_latency_and_cost": "TODO: medir (sem chaves de API; so provider fake)",
+    "note": "n pequeno (reps); medianas nao sao estatisticamente robustas."
+  },
+  "multi_agent": {
+    "S1_simple": {
+      "name": "pedido simples resolvido",
+      "expected": {
+        "status": "completed",
+        "effects": 0
+      },
+      "reps": 3,
+      "success_rate": 1.0,
+      "latency_ms_median": 2420.68,
+      "llm_calls_median": 10,
+      "tool_calls_median": 3,
+      "cost_usd_estimated_median": 0.01,
+      "duplicates_prevented_median": 0,
+      "last_status": "completed",
+      "last_effects": 0
+    },
+    "S2_three_subtasks": {
+      "name": "pedido em 3 subtarefas",
+      "expected": {
+        "status": "completed",
+        "effects": 0
+      },
+      "reps": 3,
+      "success_rate": 1.0,
+      "latency_ms_median": 2991.39,
+      "llm_calls_median": 10,
+      "tool_calls_median": 3,
+      "cost_usd_estimated_median": 0.01,
+      "duplicates_prevented_median": 0,
+      "last_status": "completed",
+      "last_effects": 0
+    },
+    "S3_approval": {
+      "name": "pedido que exige aprovacao (aprovado)",
+      "expected": {
+        "status": "completed",
+        "effects": 1
+      },
+      "reps": 3,
+      "success_rate": 1.0,
+      "latency_ms_median": 5561.33,
+      "llm_calls_median": 11,
+      "tool_calls_median": 4,
+      "cost_usd_estimated_median": 0.011,
+      "duplicates_prevented_median": 0,
+      "last_status": "completed",
+      "last_effects": 1
+    },
+    "S4_rejection": {
+      "name": "rejeicao pelo revisor",
+      "expected": {
+        "status": "rejected",
+        "effects": 0
+      },
+      "reps": 3,
+      "success_rate": 1.0,
+      "latency_ms_median": 2043.98,
+      "llm_calls_median": 11,
+      "tool_calls_median": 4,
+      "cost_usd_estimated_median": 0.011,
+      "duplicates_prevented_median": 0,
+      "last_status": "rejected",
+      "last_effects": 0
+    },
+    "S5_recovery": {
+      "name": "recuperacao apos crash",
+      "expected": {
+        "status": "completed",
+        "effects": 0
+      },
+      "reps": 3,
+      "success_rate": 1.0,
+      "latency_ms_median": 58507.12,
+      "llm_calls_median": 10,
+      "tool_calls_median": 3,
+      "cost_usd_estimated_median": 0.01,
+      "duplicates_prevented_median": 0,
+      "last_status": "completed",
+      "last_effects": 0,
+      "recovery_note": "crash real com processo filho; checkpoint SQLite (Postgres: ver tests)"
+    },
+    "S6_injection": {
+      "name": "tool injection bloqueada",
+      "expected": {
+        "status": [
+          "awaiting_approval",
+          "needs_review"
+        ],
+        "effects": 0
+      },
+      "reps": 3,
+      "success_rate": 1.0,
+      "latency_ms_median": 1285.55,
+      "llm_calls_median": 11,
+      "tool_calls_median": 4,
+      "cost_usd_estimated_median": 0.011,
+      "duplicates_prevented_median": 0,
+      "last_status": "awaiting_approval",
+      "last_effects": 0
+    },
+    "S7_no_duplicate": {
+      "name": "retry sem efeito duplicado",
+      "expected": {
+        "status": "completed",
+        "effects": 1
+      },
+      "reps": 3,
+      "success_rate": 1.0,
+      "latency_ms_median": null,
+      "llm_calls_median": 11,
+      "tool_calls_median": 4,
+      "cost_usd_estimated_median": 0.011,
+      "duplicates_prevented_median": 0,
+      "last_status": "completed",
+      "last_effects": 1
+    }
+  },
+  "baseline": {
+    "S1_simple": {
+      "name": "pedido simples resolvido",
+      "expected": {
+        "status": "completed",
+        "effects": 0
+      },
+      "reps": 3,
+      "success_rate": 1.0,
+      "latency_ms_median": 5.62,
+      "llm_calls_median": 0,
+      "tool_calls_median": 1,
+      "cost_usd_estimated_median": 0.0,
+      "duplicates_prevented_median": 0,
+      "last_status": "completed",
+      "last_effects": 0
+    },
+    "S2_three_subtasks": {
+      "name": "pedido em 3 subtarefas",
+      "expected": {
+        "status": "completed",
+        "effects": 0
+      },
+      "reps": 3,
+      "success_rate": 1.0,
+      "latency_ms_median": 2.43,
+      "llm_calls_median": 0,
+      "tool_calls_median": 1,
+      "cost_usd_estimated_median": 0.0,
+      "duplicates_prevented_median": 0,
+      "last_status": "completed",
+      "last_effects": 0
+    },
+    "S3_approval": {
+      "name": "pedido que exige aprovacao (aprovado)",
+      "expected": {
+        "status": "completed",
+        "effects": 1
+      },
+      "reps": 3,
+      "success_rate": 1.0,
+      "latency_ms_median": 43.81,
+      "llm_calls_median": 0,
+      "tool_calls_median": 2,
+      "cost_usd_estimated_median": 0.0,
+      "duplicates_prevented_median": 0,
+      "last_status": "completed",
+      "last_effects": 1
+    },
+    "S4_rejection": {
+      "name": "rejeicao pelo revisor",
+      "expected": {
+        "status": "rejected",
+        "effects": 0
+      },
+      "reps": 3,
+      "success_rate": 1.0,
+      "latency_ms_median": 2.87,
+      "llm_calls_median": 0,
+      "tool_calls_median": 1,
+      "cost_usd_estimated_median": 0.0,
+      "duplicates_prevented_median": 0,
+      "last_status": "rejected",
+      "last_effects": 0
+    },
+    "S5_recovery": {
+      "name": "recuperacao apos crash",
+      "expected": {
+        "status": "completed",
+        "effects": 0
+      },
+      "reps": 3,
+      "success_rate": null,
+      "latency_ms_median": null,
+      "llm_calls_median": 0,
+      "tool_calls_median": 0,
+      "cost_usd_estimated_median": 0.0,
+      "duplicates_prevented_median": 0,
+      "last_status": null,
+      "last_effects": 0,
+      "recovery_note": "crash real com processo filho; checkpoint SQLite (Postgres: ver tests)",
+      "not_applicable": "baseline sem checkpoint: nao ha retoma"
+    },
+    "S6_injection": {
+      "name": "tool injection bloqueada",
+      "expected": {
+        "status": [
+          "awaiting_approval",
+          "needs_review"
+        ],
+        "effects": 0
+      },
+      "reps": 3,
+      "success_rate": 1.0,
+      "latency_ms_median": 1.59,
+      "llm_calls_median": 0,
+      "tool_calls_median": 1,
+      "cost_usd_estimated_median": 0.0,
+      "duplicates_prevented_median": 0,
+      "last_status": "needs_review",
+      "last_effects": 0
+    },
+    "S7_no_duplicate": {
+      "name": "retry sem efeito duplicado",
+      "expected": {
+        "status": "completed",
+        "effects": 1
+      },
+      "reps": 3,
+      "success_rate": 0.0,
+      "latency_ms_median": 45.91,
+      "llm_calls_median": 0,
+      "tool_calls_median": 2,
+      "cost_usd_estimated_median": 0.0,
+      "duplicates_prevented_median": 0,
+      "last_status": "completed",
+      "last_effects": 2
+    }
+  }
+}

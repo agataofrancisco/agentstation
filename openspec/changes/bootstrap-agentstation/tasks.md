@@ -55,10 +55,10 @@
 
 ## 9. Avaliação
 
-- [ ] 9.1 Implementar a suite dos 7 cenários de demonstração com exit ≠ 0 em falha; verificar que passa em modo fake
-- [ ] 9.2 Implementar a baseline determinística e o runner comparativo com as métricas da spec; verificar que o relatório inclui os cenários em que a baseline ganha
-- [ ] 9.3 Correr a avaliação e gravar os resultados reais com metadados; verificar que os campos não medidos estão como `TODO: medir`
-- [ ] 9.4 Escrever `docs/learn/09-multiagente-vs-workflow.md` com base nos resultados obtidos; verificar que cada conclusão cita um número do relatório
+- [x] 9.1 Implementar a suite dos 7 cenários de demonstração com exit ≠ 0 em falha; verificar que passa em modo fake
+- [x] 9.2 Implementar a baseline determinística e o runner comparativo com as métricas da spec; verificar que o relatório inclui os cenários em que a baseline ganha
+- [x] 9.3 Correr a avaliação e gravar os resultados reais com metadados; verificar que os campos não medidos estão como `TODO: medir`
+- [x] 9.4 Escrever `docs/learn/09-multiagente-vs-workflow.md` com base nos resultados obtidos; verificar que cada conclusão cita um número do relatório
 
 ## 10. Entrega e integração
 
