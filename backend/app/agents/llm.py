@@ -56,6 +56,16 @@ class LLMProvider(Protocol):
 RETRYABLE_STATUS = {429, 500, 502, 503, 504}
 
 
+def _delimited(prompt: dict[str, Any]) -> dict[str, Any]:
+    """Observacoes das ferramentas entram como dados delimitados, nunca como instrucoes."""
+    from backend.app.tools.injection import wrap_untrusted
+
+    out = dict(prompt)
+    if "observations" in out:
+        out["observations"] = wrap_untrusted(json.dumps(out["observations"], ensure_ascii=False))
+    return out
+
+
 class OpenAICompatibleProvider:
     name = "openai"
 
@@ -99,7 +109,7 @@ class OpenAICompatibleProvider:
             "response_format": {"type": "json_object"},
             "messages": [
                 {"role": "system", "content": SYSTEM_PROMPTS.get(agent, "Responde JSON.")},
-                {"role": "user", "content": json.dumps(prompt, ensure_ascii=False)},
+                {"role": "user", "content": json.dumps(_delimited(prompt), ensure_ascii=False)},
             ],
         }
         response = self._post(body)

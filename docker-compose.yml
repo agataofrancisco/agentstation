@@ -1,0 +1,27 @@
+# NAO TESTADO LOCALMENTE (sem Docker). Validar com `docker compose config` quando houver Docker.
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: agentstation
+    ports: ["15432:5432"]
+  redis:
+    image: redis:7
+    ports: ["16379:6379"]
+  api:
+    build: .
+    depends_on: [postgres, redis]
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/agentstation
+      CHECKPOINT_URL: postgresql://postgres:postgres@postgres:5432/agentstation
+      CELERY_BROKER_URL: redis://redis:6379/0
+    ports: ["18100:18100"]
+  worker:
+    build: .
+    depends_on: [postgres, redis]
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/agentstation
+      CHECKPOINT_URL: postgresql://postgres:postgres@postgres:5432/agentstation
+      CELERY_BROKER_URL: redis://redis:6379/0
+    command: ["celery", "-A", "backend.app.workers.celery_app", "worker", "--pool=solo"]

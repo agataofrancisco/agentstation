@@ -63,9 +63,9 @@
 ## 10. Entrega e integração
 
 - [ ] 10.1 Escrever Dockerfiles e `docker-compose.yml` (api, worker, postgres, redis, frontend) marcados como não testados localmente; verificar com `docker compose config` quando houver Docker
-- [ ] 10.2 Criar CI (Ruff, pytest, testes postgres/redis com services, cenários fake, build do frontend); verificar que o workflow é válido
-- [ ] 10.3 Escrever `README.md`, `docs/architecture.md`, `docs/decisions.md` e `docs/case-study.md`; verificar que os comandos do README correm
-- [ ] 10.4 Escrever `docs/learn/10-perguntas-de-entrevista.md` (≥25 perguntas); verificar a consistência com o código final
+- [x] 10.2 Criar CI (Ruff, pytest, testes postgres/redis com services, cenários fake, build do frontend); verificar que o workflow é válido
+- [x] 10.3 Escrever `README.md`, `docs/architecture.md`, `docs/decisions.md` e `docs/case-study.md`; verificar que os comandos do README correm
+- [x] 10.4 Escrever `docs/learn/10-perguntas-de-entrevista.md` (≥25 perguntas); verificar a consistência com o código final
 - [ ] 10.5 Revisão independente de segurança (autorização, aprovação, injecção, memória); verificar que os achados estão resolvidos ou documentados
 
 ## Workflow follow-up

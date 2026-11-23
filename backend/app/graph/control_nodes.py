@@ -13,6 +13,7 @@ from backend.app.graph.state import TaskState
 from backend.app.store.approvals import add_reason, create_or_get
 from backend.app.store.models import Approval
 from backend.app.tools.effects import apply_effect
+from backend.app.tools.errors import ToolError
 
 ALLOWED_ROUTES = ("triage", "knowledge_retrieval", "reporting", "verifier", "finalize")
 
@@ -183,14 +184,18 @@ def make_execute_action(deps: GraphDeps):
             emit = emit_for(session, state, node="execute_action", agent="execute_action")
             if decision.get("params") and decision["params"] != pending["params"]:
                 emit("approval_edited", {"original": pending["params"], "edited": params})
-            result, outcome = apply_effect(
-                deps.session_factory,
-                tenant_id=state["tenant_id"],
-                task_id=state["task_id"],
-                approval_id=pending["approval_id"],
-                action=pending["action"],
-                params=params,
-            )
+            try:
+                result, outcome = apply_effect(
+                    deps.session_factory,
+                    tenant_id=state["tenant_id"],
+                    task_id=state["task_id"],
+                    approval_id=pending["approval_id"],
+                    action=pending["action"],
+                    params=params,
+                )
+            except ToolError as exc:
+                emit("effect_failed", {"action": pending["action"], "code": exc.code})
+                return {"status": "failed", "error": exc.code}
             event = {
                 "executed": "effect_executed",
                 "duplicate": "duplicate_effect_prevented",
