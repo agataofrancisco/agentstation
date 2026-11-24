@@ -45,14 +45,19 @@ export async function streamEvents({ taskId, token, lastId, signal, onEvent }) {
     const { value, done } = await reader.read();
     if (done) break;
     buffer += decoder.decode(value, { stream: true });
+    // SSE aceita LF, CRLF e CR; normalize antes de procurar o separador de eventos.
+    buffer = buffer.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
     let idx;
     while ((idx = buffer.indexOf("\n\n")) !== -1) {
       const block = buffer.slice(0, idx);
       buffer = buffer.slice(idx + 2);
-      const dataLine = block.split("\n").find((l) => l.startsWith("data: "));
-      if (!dataLine) continue;
+      const dataLines = block
+        .split("\n")
+        .filter((line) => line.startsWith("data:"))
+        .map((line) => line.slice(5).replace(/^ /, ""));
+      if (dataLines.length === 0) continue;
       try {
-        onEvent(JSON.parse(dataLine.slice(6)));
+        onEvent(JSON.parse(dataLines.join("\n")));
       } catch {
         // linha mal formada: ignorada (nunca derruba o painel)
       }
