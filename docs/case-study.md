@@ -6,6 +6,8 @@ Um helpdesk interno precisa de triagem rápida, mas nenhuma acção sobre contas
 
 - Os 7 cenários passam no multi-agente.
 - Recuperação após crash real (processo filho, checkpoint SQLite e PostgreSQL) retoma sem repetir a triagem.
+- Em 2026-11-24, um teste com dois workers Celery reais, broker `filesystem://` e PostgreSQL real
+  passou: o segundo retomou após o crash do primeiro sem repetir a triagem (`1 passed in 303.64s`).
 - Efeitos duplicados: o multi-agente executa 1 efeito; a baseline sem idempotência executa 2.
 - Latência: a baseline é muito mais rápida nos pedidos simples (ver `docs/learn/09`).
 

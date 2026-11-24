@@ -20,6 +20,10 @@ class Settings(BaseSettings):
 
     celery_broker_url: str = "filesystem://"
     celery_eager: bool = False
+    # Pasta partilhada do broker filesystem (kombu). Sem Redis, para testes reais de worker.
+    celery_fs_dir: str | None = None
+    # Ao arrancar, reenfileira tarefas nao concluidas (rede de seguranca independente do broker).
+    requeue_on_start: bool = True
 
     # Sem valor predefinido. Fora de demo: obrigatorio, >= 32 caracteres.
     # Em demo: gerado de forma efemera por processo (ver validador).

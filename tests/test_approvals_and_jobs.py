@@ -55,6 +55,15 @@ def test_requester_cannot_resolve_even_own_approval(app, runtime):
             resolve_approval(s, REQUESTER, approval.id, decision="approve")
 
 
+def test_reviewer_cannot_approve_own_task(app, runtime):
+    task_id = new_task(app, "Faz reset de MFA para joao@nimbo, ticket T-105", REVIEWER)
+    assert jobs.run_task_job(task_id, runtime) == "started"
+    approval = pending_approval(app, task_id)
+    with app.state.session_factory() as s:
+        with pytest.raises(ApprovalForbidden):
+            resolve_approval(s, REVIEWER, approval.id, decision="approve")
+
+
 def test_reviewer_from_other_tenant_gets_not_found(app, runtime):
     task_id = new_task(app, "Faz reset de MFA para joao@nimbo, ticket T-105")
     jobs.run_task_job(task_id, runtime)

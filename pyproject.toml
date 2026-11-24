@@ -25,6 +25,8 @@ dependencies = [
   "pyjwt==2.15.1",
   "sse-starlette==3.7.0",
   "uvicorn==0.54.0",
+  # kombu filesystem (broker sem Redis) precisa de pywintypes no Windows.
+  "pywin32==312; sys_platform == 'win32'",
 ]
 
 [project.optional-dependencies]

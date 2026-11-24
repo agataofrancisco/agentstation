@@ -16,7 +16,7 @@ Cada resposta aponta para o código ou para o documento onde o tema está explic
 7. **Porque `durability="sync"`?** Para o checkpoint estar escrito antes do passo seguinte. Com `async` o último passo pode perder-se num crash.
 8. **Porque não guardar o estado na fila Celery?** A fila entrega mensagens, não guarda um histórico consistente. Perder o broker não pode perder a tarefa.
 9. **Como testaste a recuperação após crash?** Um processo filho termina com `os._exit` em `knowledge_retrieval`; outro processo retoma do checkpoint; a triagem não é recalculada. Passou com PostgreSQL 16.2 real via `pgserver`.
-10. **O que NÃO está provado sobre o Celery?** Não arrancámos um worker Celery vivo com broker. O código existe (`acks_late`), mas a recuperação foi testada com um processo filho que chama `run_task_job`. Fica como pendência.
+10. **O que NÃO está provado sobre o Celery?** A recuperação com worker real e broker `filesystem://` passou em 2026-11-24. Falta verificar o broker Redis da configuração Docker.
 
 ## Aprovação
 
@@ -58,6 +58,6 @@ Cada resposta aponta para o código ou para o documento onde o tema está explic
 31. **Como se verifica a saúde?** `/health` verifica a base de dados e um heartbeat de worker; sem worker activo, o estado é `degraded`.
 32. **O que é o `Last-Event-ID` no SSE?** O cliente reconecta com o último `seq` recebido e recebe só os eventos seguintes, sem duplicados.
 33. **Onde ficam as migrações e quem as aplica?** Alembic (`migrations/`); `create_all` só em testes e demos. O seed é idempotente (`merge` por chave).
-34. **O que falta para produção?** Worker Celery vivo com broker, frontend, integrações reais, revisão de segurança independente, e medições com provider real.
+34. **O que falta para produção?** Validar o stack Docker com broker Redis, verificar visualmente o frontend, resolver os achados abertos da revisão independente, testar integrações reais e medir com provider real.
 
 Notas: a lista de decisões novas está em `docs/decisions.md`; as limitações de segurança estão em `docs/security-review.md`.

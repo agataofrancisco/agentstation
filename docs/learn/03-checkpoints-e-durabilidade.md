@@ -44,8 +44,12 @@ O mesmo mecanismo, em PostgreSQL real, é exercitado pelo teste de recuperação
 
 ## Limitações honestas
 
-- O teste de crash mata um processo filho que executa `run_task_job` directamente, **não um worker Celery real**. O código Celery existe (`backend/app/workers/tasks.py`, `acks_late=True`) mas não foi arrancado com um broker vivo neste ambiente (sem Redis; o broker `filesystem://` não foi validado). Ver o relatório final.
-- Não há reconciliação de checkpoints órfãos (tarefa `running` sem worker); fica para o `/health` e para o grupo 7.
+- Em 2026-11-24, `tests/test_celery_worker.py` passou com dois processos Celery reais, broker
+  `filesystem://` e PostgreSQL real. O primeiro morreu após a triagem; o segundo retomou do
+  checkpoint e a chamada a `get_ticket` continuou única. O broker Redis da configuração Docker
+  continua por validar após o reinício do ambiente.
+- O arranque do worker reenfileira tarefas `queued`/`running` para reconciliar trabalho órfão;
+  a prova de crash acima cobre este caminho.
 
 ## Perguntas de entrevista
 
