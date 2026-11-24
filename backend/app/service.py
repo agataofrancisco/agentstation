@@ -177,10 +177,17 @@ def resolve_approval(
     """Devolve (aprovacao, mudou). Segunda resolucao nao altera nada (idempotente)."""
     from backend.app.store.approvals import audit
 
-    approval = session.get(Approval, approval_id)
+    # Lock the row while deciding it so two reviewers cannot commit conflicting decisions.
+    approval = (
+        session.query(Approval)
+        .filter(Approval.id == approval_id)
+        .with_for_update()
+        .populate_existing()
+        .one_or_none()
+    )
     if approval is None or approval.tenant_id != principal.tenant_id:
         raise ApprovalNotFound()
-    if not principal.is_reviewer:
+    if not principal.is_reviewer or approval.requester_id == principal.user_id:
         raise ApprovalForbidden()
     if decision not in DECISIONS:
         raise InvalidDecision("decisao invalida")
