@@ -1,7 +1,7 @@
 # Revisão de segurança independente
 
-**Estado:** revisão estática concluída; achados documentados.  
-**Escopo:** `HEAD` `1fa707a` e árvore de trabalho em 2026-11-24, incluindo a implementação de workers ainda não commitada.  
+**Estado:** revisão estática concluída; achados documentados.
+**Escopo:** `HEAD` `1fa707a` e árvore de trabalho em 2026-11-24, incluindo a implementação de workers ainda não commitada.
 **Método:** leitura de autorização, resolução de aprovação, ferramentas, memória, JWT e revisão anterior. Não foram executados testes nem serviços externos.
 
 ## Achados
