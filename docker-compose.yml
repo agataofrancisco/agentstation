@@ -1,3 +1,4 @@
+# DEMO LOCAL: dados e palavras-passe de Postgres são de demonstração; não expor à Internet.
 # NAO TESTADO LOCALMENTE (sem Docker). Validar com `docker compose config` quando houver Docker.
 services:
   postgres:
@@ -6,22 +7,72 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: agentstation
     ports: ["15432:5432"]
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d agentstation"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
   redis:
     image: redis:7
     ports: ["16379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  migrate:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment: &app-environment
+      DEMO_MODE: "true"
+      LLM_PROVIDER: fake
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/agentstation
+      CHECKPOINT_URL: postgresql://postgres:postgres@postgres:5432/agentstation
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CORS_ORIGINS: http://localhost:13100,http://127.0.0.1:13100
+    command: ["sh", "-c", "alembic upgrade head && python -m backend.app.seed"]
+    restart: "no"
   api:
     build: .
-    depends_on: [postgres, redis]
-    environment:
-      DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/agentstation
-      CHECKPOINT_URL: postgresql://postgres:postgres@postgres:5432/agentstation
-      CELERY_BROKER_URL: redis://redis:6379/0
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    environment: *app-environment
     ports: ["18100:18100"]
+    volumes:
+      - chroma-data:/app/data/runtime/chroma
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:18100/health', timeout=3)"]
+      interval: 10s
+      timeout: 4s
+      retries: 10
   worker:
     build: .
-    depends_on: [postgres, redis]
-    environment:
-      DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/agentstation
-      CHECKPOINT_URL: postgresql://postgres:postgres@postgres:5432/agentstation
-      CELERY_BROKER_URL: redis://redis:6379/0
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    environment: *app-environment
+    volumes:
+      - chroma-data:/app/data/runtime/chroma
     command: ["celery", "-A", "backend.app.workers.celery_app", "worker", "--pool=solo"]
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:18100
+    depends_on:
+      api:
+        condition: service_healthy
+    ports: ["13100:80"]
+
+volumes:
+  postgres-data:
+  chroma-data:
