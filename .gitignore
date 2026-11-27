@@ -28,3 +28,7 @@ chroma/
 Thumbs.db
 .idea/
 .vscode/
+
+# Runtime local (broker Celery em filesystem) e ferramentas
+control/
+.claude-flow/

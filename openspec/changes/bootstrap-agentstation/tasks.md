@@ -50,7 +50,7 @@
 ## 8. Frontend
 
 - [x] 8.1 Criar a app React com login por persona, lista de tarefas e criação de pedido; verificar com `npm run build`
-- [ ] 8.2 Implementar o diagrama do grafo com nó actual e a linha temporal por SSE; verificar no browser com uma tarefa de 3 subtarefas
+- [x] 8.2 Implementar o diagrama do grafo com nó actual e a linha temporal por SSE; verificar no browser com uma tarefa de 3 subtarefas (verificado 2026-11-27, `CELERY_EAGER`, provider fake: S2 delegou triage → knowledge_retrieval → reporting; nós visitados a verde, approval_gate/execute_action a cinzento; linha temporal via `GET /tasks/{id}/events` 200; sem erros na consola. Em modo eager o nó activo não é observável ao vivo)
 - [x] 8.3 Implementar a fila de aprovações (aceitar, rejeitar, editar), o painel de memória e a exportação; verificar no browser os fluxos de aprovação e de rejeição
 
 ## 9. Avaliação
@@ -62,7 +62,7 @@
 
 ## 10. Entrega e integração
 
-- [ ] 10.1 Escrever Dockerfiles e `docker-compose.yml` (api, worker, postgres, redis, frontend) marcados como não testados localmente; verificar com `docker compose config` quando houver Docker
+- [x] 10.1 Escrever Dockerfiles e `docker-compose.yml` (api, worker, postgres, redis, frontend) marcados como não testados localmente; verificar com `docker compose config` quando houver Docker (`docker compose config -q` OK em 2026-11-27; `docker compose up` não executado: daemon Docker indisponível)
 - [x] 10.2 Criar CI (Ruff, pytest, testes postgres/redis com services, cenários fake, build do frontend); verificar que o workflow é válido
 - [x] 10.3 Escrever `README.md`, `docs/architecture.md`, `docs/decisions.md` e `docs/case-study.md`; verificar que os comandos do README correm
 - [x] 10.4 Escrever `docs/learn/10-perguntas-de-entrevista.md` (≥25 perguntas); verificar a consistência com o código final

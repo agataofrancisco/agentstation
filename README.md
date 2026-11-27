@@ -6,10 +6,13 @@ Domínio fictício: helpdesk da **Nimbo Software** (tenant `nimbo`) e **Atlas Re
 ## Estado actual
 
 - Backend (FastAPI + LangGraph + SQLAlchemy/Alembic + Celery): implementado e testado.
-- Checkpointer PostgreSQL e recuperação após crash: testados com PostgreSQL real (`pgserver`, sem Docker).
-- Frontend React: **não implementado nesta entrega** (ver relatório). A porta reservada é `13100`.
-- Docker/compose: escritos mas **não testados** (sem Docker local).
-- Revisão de segurança: auto-revisão em `docs/security-review.md`; a revisão independente continua pendente.
+- Checkpointer PostgreSQL e recuperação após crash: testados com PostgreSQL real (`pgserver`, sem Docker),
+  incluindo um worker Celery real interrompido e outro que retoma sem repetir a triagem.
+- Frontend React: implementado e com build validado. O diagrama do grafo e a linha
+  temporal verificada no browser (cenário de 3 subtarefas). Porta de desenvolvimento: `13100`.
+- Docker/compose: `docker compose config` válido; `docker compose up` **não testado** (daemon Docker indisponível).
+- Revisão de segurança: auto-revisão e revisão independente em `docs/security-review-independent.md`.
+  Permanecem os limites documentados nessa revisão.
 
 ## Executar localmente (sem Docker, sem chaves de API)
 
