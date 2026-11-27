@@ -9,7 +9,7 @@ Domínio fictício: helpdesk da **Nimbo Software** (tenant `nimbo`) e **Atlas Re
 - Checkpointer PostgreSQL e recuperação após crash: testados com PostgreSQL real (`pgserver`, sem Docker),
   incluindo um worker Celery real interrompido e outro que retoma sem repetir a triagem.
 - Frontend React: implementado e com build validado. O diagrama do grafo e a linha
-  temporal verificada no browser (cenário de 3 subtarefas). Porta de desenvolvimento: `13100`.
+  temporal foram verificados no browser (cenário de 3 subtarefas). Porta de desenvolvimento: `13100`.
 - Docker/compose: `docker compose config` válido; `docker compose up` **não testado** (daemon Docker indisponível).
 - Revisão de segurança: auto-revisão e revisão independente em `docs/security-review-independent.md`.
   Permanecem os limites documentados nessa revisão.
