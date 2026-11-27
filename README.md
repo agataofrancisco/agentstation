@@ -74,7 +74,7 @@ flowchart LR
 
 Python 3.12 · FastAPI · LangGraph · Celery · Redis · PostgreSQL / SQLite · SQLAlchemy + Alembic ·
 Server-Sent Events · React + Vite + React Flow · pytest (pgserver for real Postgres) · Ruff ·
-Docker Compose · GitHub Actions
+Docker Compose
 
 ## Run it locally (no Docker, no API keys)
 
