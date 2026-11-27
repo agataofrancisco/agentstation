@@ -1,4 +1,4 @@
-# NAO TESTADO LOCALMENTE (sem Docker nesta maquina). Imagem unica para API e worker.
+# Verificado com Docker em 2026-11-27. Imagem unica para API e worker.
 FROM python:3.12-slim
 WORKDIR /app
 COPY pyproject.toml ./

@@ -97,7 +97,8 @@ Personas: `ines@nimbo` (requester), `rui@nimbo` (reviewer), `ada@nimbo` (admin),
 aplicavel e prepara uma resposta" (classify ticket T-101, find the applicable procedure and draft a
 reply) to watch three subtasks run.
 
-**Full stack with Docker** (api, worker, postgres, redis, frontend):
+**Full stack with Docker** (api, worker, postgres, redis, frontend; verified on 2026-11-27, with all
+healthchecks green, `/health` 200 and the UI served):
 
 ```bash
 docker compose up --build

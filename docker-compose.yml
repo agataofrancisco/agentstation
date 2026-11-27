@@ -1,5 +1,5 @@
 # DEMO LOCAL: dados e palavras-passe de Postgres são de demonstração; não expor à Internet.
-# NAO TESTADO LOCALMENTE (sem Docker). Validar com `docker compose config` quando houver Docker.
+# Verificado com docker compose em 2026-11-27.
 services:
   postgres:
     image: postgres:16
